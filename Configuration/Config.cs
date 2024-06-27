@@ -4,7 +4,9 @@ using TerraUtil.Configuration;
 
 namespace AccessoriesPlus.Configuration;
 
-#pragma warning disable CS0649
+// ReSharper disable UnassignedField.Global
+// ReSharper disable ConvertToConstant.Global
+// ReSharper disable FieldCanBeMadeReadOnly.Global
 
 public class Config : ModConfiguration
 {

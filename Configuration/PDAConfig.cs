@@ -3,6 +3,9 @@ using TerraUtil.Configuration;
 
 namespace AccessoriesPlus.Configuration;
 
+// ReSharper disable ConvertToConstant.Global
+// ReSharper disable FieldCanBeMadeReadOnly.Global
+
 public class PDAConfig : SubConfiguration
 {
     public static PDAConfig Instance => Config.Instance.ImprovedPDA;
@@ -31,6 +34,6 @@ public class PDAConfig : SubConfiguration
     public bool UseNPCBlacklist = true;
     //public Dictionary<NPCDefinition, int> NPCWhitelist = new();
     // TODO: add rarities to NPC whitelist
-    public List<NPCDefinition> NPCWhitelist = new();
-    public List<NPCDefinition> NPCBlacklist = new();
+    public List<NPCDefinition> NPCWhitelist = [];
+    public List<NPCDefinition> NPCBlacklist = [];
 }
