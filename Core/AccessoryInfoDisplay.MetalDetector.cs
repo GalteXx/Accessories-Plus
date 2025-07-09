@@ -1,4 +1,5 @@
 ﻿using Terraria.Map;
+using Terraria.ModLoader.Config;
 
 namespace AccessoriesPlus.Core;
 
@@ -7,6 +8,7 @@ public partial class AccessoryInfoDisplay : GlobalInfoDisplay
     private static Dictionary<int, (short, bool)> ModifiedTiles;
 
     // TODO: increasing priorities for gems
+    private const short UserChoicePriority = 230;
     private const short GemPriority = 235;
     private const short HellstonePriority = 450;
 
@@ -58,6 +60,11 @@ public partial class AccessoryInfoDisplay : GlobalInfoDisplay
             MakeTileSpelunkable(TileID.TreeRuby, GemPriority);
             MakeTileSpelunkable(TileID.TreeDiamond, GemPriority);
             MakeTileSpelunkable(TileID.TreeAmber, GemPriority);
+        }
+
+        foreach(var tile in PDAConfig.Instance.TileAllowlist)
+        {
+            MakeTileSpelunkable(tile.Type, UserChoicePriority);
         }
 
         static void MakeTileSpelunkable(int type, short priority)

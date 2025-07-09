@@ -1,4 +1,5 @@
-﻿using Terraria.ModLoader.Config;
+﻿using Terraria.GameContent.UI.ResourceSets;
+using Terraria.ModLoader.Config;
 using TerraUtil.Configuration;
 
 namespace AccessoriesPlus.Configuration;
@@ -19,11 +20,20 @@ public class PDAConfig : SubConfiguration
     public bool MetalDetectorArrows = true;
     public bool MetalDetectorHighlight = true;
 
+    //i decided to split setting into categories,
+    //categories:
+    //Ores, gems, misc, containers, userChoise
     [ReloadRequired]
     public bool TrackGems = true;
     [ReloadRequired]
-    public bool TrackHellstone = true;
-    // TODO: add whitelist and blacklist for metal detector when TileDefinition finally comes around
+    public bool TrackHellstone = true; //Technically an ore
+    [ReloadRequired]
+    public List<TileDefinition> TileAllowlist = [];
+    [ReloadRequired]
+    public List<TileDefinition> TileBlocklist = [];
+
+    public bool UseProgressionBasedHintsForOres = false;
+    public bool UseProgressionBasedHintsForGems = false;
 
     [Header("LifeformAnalyzer")]
     public bool LifeformAnalyzerDistanceInfo = true;
