@@ -10,6 +10,12 @@ namespace AccessoriesPlus.Configuration;
 public class PDAConfig : SubConfiguration
 {
     public static PDAConfig Instance => Config.Instance.ImprovedPDA;
+    public static int ArrowCategoryMask { get; private set; }
+
+    public override void OnChanged()
+    {
+
+    }
 
     [Header("Radar")]
     public bool RadarHighlightEnemies = true;
@@ -17,12 +23,11 @@ public class PDAConfig : SubConfiguration
 
     [Header("MetalDetector")]
     public bool MetalDetectorDistanceInfo = true;
-    public bool MetalDetectorArrows = true;
     public bool MetalDetectorHighlight = true;
-
     //i decided to split setting into categories,
     //categories:
-    //Ores, gems, misc, containers, userChoise
+    //Blocked, Ores, gems, misc, containers, userChoise
+    //in THIS EXACT order. It is needed for bitmapping
     [ReloadRequired]
     public bool TrackGems = true;
     [ReloadRequired]
@@ -32,8 +37,18 @@ public class PDAConfig : SubConfiguration
     [ReloadRequired]
     public List<TileDefinition> TileBlocklist = [];
 
-    public bool UseProgressionBasedHintsForOres = false;
-    public bool UseProgressionBasedHintsForGems = false;
+    //public bool ProgressiveGemArrows = false; gems aren't exactly progression based
+    //no progression based arrows for AllowList
+    public bool ProgressiveMiscArrows = false;
+    public bool ProgressiveOreArrows = false;
+
+
+    public bool MetalDetectorGemArrows = true;  
+    public bool MetalDetectorOreArrows = true;
+    public bool MetalDetectorMiscArrows = true;
+    public bool MetalDetectorContainerArrows = true;
+    public bool MetalDetectorUserChoiceArrows = true;
+
 
     [Header("LifeformAnalyzer")]
     public bool LifeformAnalyzerDistanceInfo = true;

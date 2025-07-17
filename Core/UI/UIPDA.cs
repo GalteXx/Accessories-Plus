@@ -1,4 +1,5 @@
-﻿using Terraria.UI;
+﻿using AccessoriesPlus.Core.PlayerProgression;
+using Terraria.UI;
 using Terraria.UI.Chat;
 using TerraUtil.UI;
 
@@ -85,68 +86,77 @@ public class UIPDA : Interface
     // TODO: make UI elememnts for the arrows and rework them
     protected override void DrawSelf(SpriteBatch spriteBatch)
     {
-        // Lifeform analyzer
-        if (PDAConfig.Instance.LifeformAnalyzerArrows && Util.InfoDisplayActive(InfoDisplay.LifeformAnalyzer))
+        DrawLifeForms(spriteBatch);
+        DrawMetalDetectedTiles(spriteBatch);
+    }
+
+    private void DrawLifeForms(SpriteBatch spriteBatch)
+    {
+        if (!PDAConfig.Instance.LifeformAnalyzerArrows || !Util.InfoDisplayActive(InfoDisplay.LifeformAnalyzer))
+            return;
+
+        foreach (var npc in AccessoryInfoDisplay.LifeformAnalyzerNPCs)
         {
-            foreach (var npc in AccessoryInfoDisplay.LifeformAnalyzerNPCs)
-            {
-                if (npc.active)
-                    DrawNPCArrow(spriteBatch, npc);
-            }
+            if (npc.active)
+                DrawNPCArrow(spriteBatch, npc);
         }
+    }
 
-        // Metal detector
+    private void DrawMetalDetectedTiles(SpriteBatch spriteBatch)
+    {
         // TODO: better system for blobbing framed tiles together, and also making frameImportant tiles have their position centered
-        if (PDAConfig.Instance.MetalDetectorArrows && Util.InfoDisplayActive(InfoDisplay.MetalDetector))
+        if (!Util.InfoDisplayActive(InfoDisplay.MetalDetector))
+            return;
+
+        var trackedTiles = new List<(Tile, Point)>();
+
+        // Looping over the tiles
+        for (int x = Main.LocalPlayer.Center.ToTileCoordinates().X - Main.buffScanAreaWidth / 2; x < Main.LocalPlayer.Center.ToTileCoordinates().X + Main.buffScanAreaWidth / 2; x++)
         {
-            var trackedTiles = new List<(Tile, Point)>();
-
-            // Looping over the tiles
-            for (int x = Main.LocalPlayer.Center.ToTileCoordinates().X - Main.buffScanAreaWidth / 2; x < Main.LocalPlayer.Center.ToTileCoordinates().X + Main.buffScanAreaWidth / 2; x++)
+            for (int y = Main.LocalPlayer.Center.ToTileCoordinates().Y - Main.buffScanAreaHeight / 2; y < Main.LocalPlayer.Center.ToTileCoordinates().Y + Main.buffScanAreaHeight / 2; y++)
             {
-                for (int y = Main.LocalPlayer.Center.ToTileCoordinates().Y - Main.buffScanAreaHeight / 2; y < Main.LocalPlayer.Center.ToTileCoordinates().Y + Main.buffScanAreaHeight / 2; y++)
+                // Bounds check
+                if (x < 0 || x > Main.maxTilesX || y < 0 || y > Main.maxTilesY) //possibly add a "too close" for hint value?
+                    continue;
+
+                var tile = Main.tile[x, y];
+                if (!SceneMetrics.IsValidForOreFinder(tile))
+                    continue;
+
+                if()
+
+                // Adding the tile if there isn't one already
+                if (!trackedTiles.Where(t => t.Item1.TileType == tile.TileType).Any())
                 {
-                    // Bounds check
-                    if (x < 0 || x > Main.maxTilesX || y < 0 || y > Main.maxTilesY)
-                        continue;
+                    trackedTiles.Add((tile, new Point(x, y)));
+                    continue;
+                }
 
-                    var tile = Main.tile[x, y];
-                    if (SceneMetrics.IsValidForOreFinder(tile))
+                // Removing the exitsing tile if this one is closer
+                var tilesToRemove = new List<(Tile, Point)>();
+                var tilesToAdd = new List<(Tile, Point)>();
+
+                foreach (var trackedTile in trackedTiles)
+                {
+                    if (trackedTile.Item1.TileType == tile.TileType && trackedTile.Item2.ToWorldCoordinates().Distance(Main.LocalPlayer.Center) >= new Point(x, y).ToWorldCoordinates().Distance(Main.LocalPlayer.Center))
                     {
-                        // Adding the tile if there isn't one already
-                        if (!trackedTiles.Where(t => t.Item1.TileType == tile.TileType).Any())
-                        {
-                            trackedTiles.Add((tile, new Point(x, y)));
-                            continue;
-                        }
-
-                        // Removing the exitsing tile if this one is closer
-                        var tilesToRemove = new List<(Tile, Point)>();
-                        var tilesToAdd = new List<(Tile, Point)>();
-
-                        foreach (var trackedTile in trackedTiles)
-                        {
-                            if (trackedTile.Item1.TileType == tile.TileType && trackedTile.Item2.ToWorldCoordinates().Distance(Main.LocalPlayer.Center) >= new Point(x, y).ToWorldCoordinates().Distance(Main.LocalPlayer.Center))
-                            {
-                                tilesToRemove.Add(trackedTile);
-                                tilesToAdd.Add((tile, new Point(x, y)));
-                            }
-                        }
-
-                        // Actually doing the removing and adding
-                        foreach (var tileToAdd in tilesToAdd)
-                            trackedTiles.Add(tileToAdd);
-
-                        foreach (var tileToRemove in tilesToRemove)
-                            trackedTiles.Remove(tileToRemove);
+                        tilesToRemove.Add(trackedTile);
+                        tilesToAdd.Add((tile, new Point(x, y)));
                     }
                 }
-            }
 
-            // Drawing
-            foreach (var tile in trackedTiles)
-                DrawTileArrow(spriteBatch, tile.Item1, tile.Item2.X, tile.Item2.Y);
+                // Actually doing the removing and adding
+                foreach (var tileToAdd in tilesToAdd)
+                    trackedTiles.Add(tileToAdd);
+
+                foreach (var tileToRemove in tilesToRemove)
+                    trackedTiles.Remove(tileToRemove);
+            }
         }
+
+        // Drawing
+        foreach (var tile in trackedTiles)
+            DrawTileArrow(spriteBatch, tile.Item1, tile.Item2.X, tile.Item2.Y);
     }
 
     // Gets the preview texture for a tile

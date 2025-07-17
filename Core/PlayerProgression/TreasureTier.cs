@@ -73,5 +73,21 @@ internal static class MetalDetectorTileCategories
     public static IReadOnlyDictionary<int, ProgressionStage> ContainerTier => containerTier;
     public static IReadOnlyDictionary<int, ProgressionStage> MiscellaneousTier => miscTier;
 
-    public static ProgressionStage GetStage(int itemId) => OreTier.TryGetValue(itemId, out ProgressionStage stage) ? stage : ProgressionStage.PreEvilBoss;
+    public static TileCategory GetTileCategory(Tile tile)
+    {
+        if (PDAConfig.Instance.TileBlocklist.Any(x => x.Type == tile.TileType))
+            return TileCategory.BlockedCategory;
+        if (oreTier.ContainsKey(tile.TileType))
+            return TileCategory.Ore;
+        if(gemTier.ContainsKey(tile.TileType))
+            return TileCategory.Gem;
+        if(containerTier.ContainsKey(tile.TileType))
+            return TileCategory.Container;
+        if (miscTier.ContainsKey(tile.TileType))
+            return TileCategory.Miscellanious;
+        if (PDAConfig.Instance.TileAllowlist.Any(x => x.Type == tile.TileType))
+            return TileCategory.UserChoice;
+
+        return TileCategory.BlockedCategory; //Not a category is litterally the same as blocked, even though it might cause confusion when reading
+    }
 }

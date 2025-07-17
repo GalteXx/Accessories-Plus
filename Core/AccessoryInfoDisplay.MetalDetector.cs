@@ -1,4 +1,5 @@
-﻿using Terraria.Map;
+﻿using AccessoriesPlus.Core.PlayerProgression;
+using Terraria.Map;
 using Terraria.ModLoader.Config;
 
 namespace AccessoriesPlus.Core;
@@ -43,26 +44,11 @@ public partial class AccessoryInfoDisplay : GlobalInfoDisplay
 
         if (PDAConfig.Instance.TrackGems)
         {
-            MakeTileSpelunkable(TileID.ExposedGems, GemPriority);
-
-            MakeTileSpelunkable(TileID.Amethyst, GemPriority);
-            MakeTileSpelunkable(TileID.Topaz, GemPriority);
-            MakeTileSpelunkable(TileID.Sapphire, GemPriority);
-            MakeTileSpelunkable(TileID.Emerald, GemPriority);
-            MakeTileSpelunkable(TileID.Ruby, GemPriority);
-            MakeTileSpelunkable(TileID.Diamond, GemPriority);
-            MakeTileSpelunkable(TileID.AmberStoneBlock, GemPriority);
-
-            MakeTileSpelunkable(TileID.TreeAmethyst, GemPriority);
-            MakeTileSpelunkable(TileID.TreeTopaz, GemPriority);
-            MakeTileSpelunkable(TileID.TreeSapphire, GemPriority);
-            MakeTileSpelunkable(TileID.TreeEmerald, GemPriority);
-            MakeTileSpelunkable(TileID.TreeRuby, GemPriority);
-            MakeTileSpelunkable(TileID.TreeDiamond, GemPriority);
-            MakeTileSpelunkable(TileID.TreeAmber, GemPriority);
+            foreach (var tile in MetalDetectorTileCategories.GemTier)
+                MakeTileSpelunkable(tile.Key, GemPriority);
         }
 
-        foreach(var tile in PDAConfig.Instance.TileAllowlist)
+        foreach (var tile in PDAConfig.Instance.TileAllowlist)
         {
             MakeTileSpelunkable(tile.Type, UserChoicePriority);
         }
